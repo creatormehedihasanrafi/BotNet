@@ -1,0 +1,25 @@
+pycryptodome>=3.20
+stem>=1.8.2
+requests>=2.31
+scapy>=2.5.0
+pywin32>=306; platform_system=="Windows"
+pyperclip>=1.8.2
+beautifulsoup4>=4.12
+tqdm>=4.66
+# Windows ANSI Color Support
+colorama>=0.4.6
+
+# Encryption (if using advanced encryption)
+# cryptography>=41.0.0
+
+# For better terminal output (optional)
+# rich>=13.0.0
+
+# For network scanning (optional)
+# scapy>=2.5.0
+
+# For Windows clipboard access (optional)
+# pywin32>=306
+
+# For cross-platform clipboard (optional)
+# pyperclip>=1.8.2
