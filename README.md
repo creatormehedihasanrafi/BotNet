@@ -1,98 +1,101 @@
-📋 Table of Contents
-Introduction
+# 🚀 ULTRA-PRO BOTNET - Complete Guide
 
-System Architecture
+## 📋 Table of Contents
+1. [Introduction](#introduction)
+2. [System Architecture](#system-architecture)
+3. [File Structure](#file-structure)
+4. [Installation](#installation)
+5. [C2 Server Commands](#c2-server-commands)
+6. [Bot Client](#bot-client)
+7. [Modules](#modules)
+8. [Usage Steps](#usage-steps)
+9. [Security & Warnings](#security--warnings)
+10. [Troubleshooting](#troubleshooting)
 
-File Structure
+---
 
-Installation
+## 📖 Introduction
 
-C2 Server Commands
+**Ultra-Pro Botnet** is a fully featured C2 (Command & Control) server and bot client system. Built with Python, it's extensible through various modules and provides a complete botnet management solution.
 
-Bot Client
+### 🔑 Key Features:
+- 🔐 **Encrypted Communication** - All data is encrypted
+- 🎨 **Colorful Console** - Beautiful UI with Colorama
+- 📁 **Auto Data Extraction** - Automatically extracts stolen data
+- 🔄 **Auto-Update** - Bots update automatically
+- 💣 **DDoS Attack** - Multiple DDoS attack types supported
+- 🕵️ **Tor Support** - Anonymous communication via Tor relay
+- 📊 **Dynamic List** - Shows detailed bot information
 
-Modules
+---
 
-Usage Steps
-
-Security & Warnings
-
-📖 Introduction
-Ultra-Pro Botnet is a fully featured C2 (Command & Control) server and bot client system. Built with Python, it's extensible through various modules and provides a complete botnet management solution.
-
-🔑 Key Features:
-🔐 Encrypted Communication - All data is encrypted
-
-🎨 Colorful Console - Beautiful UI with Colorama
-
-📁 Auto Data Extraction - Automatically extracts stolen data
-
-🔄 Auto-Update - Bots update automatically
-
-💣 DDoS Attack - Multiple DDoS attack types supported
-
-🕵️ Tor Support - Anonymous communication via Tor relay
-
-📊 Dynamic List - Shows detailed bot information
-
-🏗️ System Architecture
-text
+## 🏗️ System Architecture
 ┌─────────────────────────────────────────────────────────────┐
-│                     C2 SERVER (c2_server.py)               │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │              Admin Console (CLI)                    │   │
-│  │  - broadcast <cmd>  - list  - bot <number>         │   │
-│  │  - DOWNLOAD <file>   - UPDATE  - DDOS              │   │
-│  │  - STEAL   - TOR_START   - SHOW_STEAL              │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                          │                                  │
-│                    ┌─────▼─────┐                           │
-│                    │  Socket   │                           │
-│                    │  Server   │                           │
-│                    │ (Port 4444)│                          │
-│                    └─────┬─────┘                           │
-│                          │                                  │
-│              ┌───────────┼───────────┐                     │
-│              ▼           ▼           ▼                     │
-│          ┌──────┐   ┌──────┐   ┌──────┐                   │
-│          │ Bot1 │   │ Bot2 │   │ Bot3 │                   │
-│          └──────┘   └──────┘   └──────┘                   │
+│ C2 SERVER (c2_server.py) │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ Admin Console (CLI) │ │
+│ │ - broadcast <cmd> - list - bot <number> │ │
+│ │ - DOWNLOAD <file> - UPDATE - DDOS │ │
+│ │ - STEAL - TOR_START - SHOW_STEAL │ │
+│ └─────────────────────────────────────────────────────┘ │
+│ │ │
+│ ┌─────▼─────┐ │
+│ │ Socket │ │
+│ │ Server │ │
+│ │ (Port 4444)│ │
+│ └─────┬─────┘ │
+│ │ │
+│ ┌───────────┼───────────┐ │
+│ ▼ ▼ ▼ │
+│ ┌──────┐ ┌──────┐ ┌──────┐ │
+│ │ Bot1 │ │ Bot2 │ │ Bot3 │ │
+│ └──────┘ └──────┘ └──────┘ │
 └─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
+│
+▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    BOT CLIENTS (bot_client.py)             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │              Features                               │   │
-│  │  - Data Steal  - DDoS Attack  - Tor Relay         │   │
-│  │  - Auto-Update - Persistence  - AV Evasion        │   │
-│  └─────────────────────────────────────────────────────┘   │
+│ BOT CLIENTS (bot_client.py) │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ Features │ │
+│ │ - Data Steal - DDoS Attack - Tor Relay │ │
+│ │ - Auto-Update - Persistence - AV Evasion │ │
+│ └─────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
-📁 File Structure
+
 text
+
+---
+
+## 📁 File Structure
 your_project_folder/
 │
-├── 📄 c2_server.py          # C2 Server (Command Center)
-├── 📄 bot_client.py          # Bot Client (Target Machine)
-├── 📄 config.py              # Configuration File
-├── 📄 requirements.txt       # Required Packages
+├── 📄 c2_server.py # C2 Server (Command Center)
+├── 📄 bot_client.py # Bot Client (Target Machine)
+├── 📄 config.py # Configuration File
+├── 📄 requirements.txt # Required Packages
 │
-├── 📁 modules/               # All Modules
-│   ├── 📄 anti_av.py         # Antivirus Evasion
-│   ├── 📄 auto_update.py     # Auto-Update System
-│   ├── 📄 data_steal.py      # Data Stealing Module
-│   ├── 📄 ddos.py            # DDoS Attack Module
-│   ├── 📄 encryption.py      # Encryption Module
-│   ├── 📄 persistence.py     # Persistence (Startup)
-│   └── 📄 tor_relay.py       # Tor Relay Module
+├── 📁 modules/ # All Modules
+│ ├── 📄 anti_av.py # Antivirus Evasion
+│ ├── 📄 auto_update.py # Auto-Update System
+│ ├── 📄 data_steal.py # Data Stealing Module
+│ ├── 📄 ddos.py # DDoS Attack Module
+│ ├── 📄 encryption.py # Encryption Module
+│ ├── 📄 persistence.py # Persistence (Startup)
+│ └── 📄 tor_relay.py # Tor Relay Module
 │
-├── 📁 steal_data/            # C2 Steal Data Storage
-├── 📁 extracted_data/        # Extracted Data Storage
-├── 📁 steal_data_bot/        # Bot Steal Data Storage
-└── 📁 extracted_data_bot/    # Bot Extracted Data Storage
-🔧 Installation
-1. Install Required Packages:
-bash
+├── 📁 steal_data/ # C2 Steal Data Storage
+├── 📁 extracted_data/ # Extracted Data Storage
+├── 📁 steal_data_bot/ # Bot Steal Data Storage
+└── 📁 extracted_data_bot/ # Bot Extracted Data Storage
+
+text
+
+---
+
+## 🔧 Installation
+
+### Step 1: Install Required Packages
+```bash
 pip install -r requirements.txt
 requirements.txt:
 text
@@ -101,10 +104,10 @@ cryptography
 requests
 pypiwin32
 psutil
-2. Start C2 Server:
+Step 2: Start C2 Server
 bash
 python c2_server.py
-3. Start Bot Client:
+Step 3: Start Bot Client
 bash
 python bot_client.py
 💻 C2 Server Commands
